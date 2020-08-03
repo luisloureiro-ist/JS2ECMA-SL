@@ -1,7 +1,6 @@
 const esprima = require("esprima");
 const yargs = require("yargs");
 const fs = require("fs");
-
 const Compiler = require("./ECMA-SL/compiler");
 
 const argv = yargs
@@ -18,7 +17,5 @@ fs.readFile(argv.input, "utf-8", (err, data) => {
 
   const prog = esprima.parseScript(data);
 
-  const ESLProg = Compiler.fromJSObjectToESLObject(prog);
-
-  console.log(ESLProg);
+  return Compiler.fromJSObjectToESLStatements(prog);
 });
