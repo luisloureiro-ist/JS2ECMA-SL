@@ -6,37 +6,37 @@ const NOpt = require("../syntax/NOpt");
 const Val = require("../syntax/Val");
 const Var = require("../syntax/Var");
 
-function translateLiteral(varExpr, eslVal) {
+function translateLiteral(eslVal) {
   return {
-    variable: varExpr,
-    statements: [new Assign(varExpr, new Val(eslVal))],
+    variable: new Val(eslVal),
+    statements: [],
   };
 }
 
-function translateBoolean(varExpr, value) {
-  return translateLiteral(varExpr, new Val.Bool(value));
+function translateBoolean(value) {
+  return translateLiteral(new Val.Bool(value));
 }
 
-function translateString(varExpr, value) {
-  return translateLiteral(varExpr, new Val.Str(value));
+function translateString(value) {
+  return translateLiteral(new Val.Str(value));
 }
 
-function translateNull(varExpr) {
-  return translateLiteral(varExpr, new Val.Null());
+function translateNull() {
+  return translateLiteral(new Val.Null());
 }
 
-function translateNumber(varExpr, value) {
+function translateNumber(value) {
   if (!Number.isFinite(value) || Number.isNaN(value)) {
     throw new Error("Invalid number: " + value);
   }
   if (Number.isInteger(value)) {
     if (Number.isSafeInteger(value)) {
-      return translateLiteral(varExpr, new Val.Int(value));
+      return translateLiteral(new Val.Int(value));
     }
 
     throw new Error("This number is not a safe integer: " + value);
   }
-  return translateLiteral(varExpr, new Val.Flt(value));
+  return translateLiteral(new Val.Flt(value));
 }
 
 function translateArray(varExpr, arr = []) {
@@ -82,17 +82,15 @@ function translateObject(varExpr, obj) {
 }
 
 function traverseAndTranslate(value) {
-  const freshVar = generateFreshVar();
-
   switch (typeof value) {
     case "undefined":
       throw new Error("The undefined value is not supported");
     case "boolean":
-      return translateBoolean(freshVar, value);
+      return translateBoolean(value);
     case "number":
-      return translateNumber(freshVar, value);
+      return translateNumber(value);
     case "string":
-      return translateString(freshVar, value);
+      return translateString(value);
     case "bigint":
       throw new Error("BigInt values are not supported: " + value);
     case "symbol":
@@ -101,13 +99,13 @@ function traverseAndTranslate(value) {
       throw new Error("Functions are not supported: " + value);
     case "object":
       if (value === null) {
-        return translateNull(freshVar);
+        return translateNull();
       } else if (value instanceof Array) {
-        return translateArray(freshVar, value);
+        return translateArray(generateFreshVar(), value);
       } else if (value instanceof RegExp) {
         throw new Error("Regular expressions are not supported: " + value);
       } else {
-        return translateObject(freshVar, value);
+        return translateObject(generateFreshVar(), value);
       }
 
     default:
