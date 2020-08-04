@@ -17,5 +17,8 @@ fs.readFile(argv.input, "utf-8", (err, data) => {
 
   const prog = esprima.parseScript(data);
 
-  return Compiler.fromJSObjectToESLStatements(prog);
+  const statements = Compiler.fromJSObjectToESLStatements(prog);
+  const func = Compiler.createFunction("buildAST", [], statements);
+
+  console.log(func.toString());
 });
