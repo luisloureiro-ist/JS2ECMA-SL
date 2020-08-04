@@ -1,7 +1,7 @@
 const esprima = require("esprima");
 const yargs = require("yargs");
 const fs = require("fs");
-const Compiler = require("./ECMA-SL/compiler");
+const translator = require("./ECMA-SL/translator");
 
 const argv = yargs
   .option("input", { alias: "i", description: "JS input file", type: "string" })
@@ -17,8 +17,8 @@ fs.readFile(argv.input, "utf-8", (err, data) => {
 
   const prog = esprima.parseScript(data);
 
-  const statements = Compiler.fromJSObjectToESLStatements(prog);
-  const func = Compiler.createFunction("buildAST", [], statements);
+  const statements = translator.fromJSObjectToESLStatements(prog);
+  const func = translator.createFunction("buildAST", [], statements);
 
   console.log(func.toString());
 });

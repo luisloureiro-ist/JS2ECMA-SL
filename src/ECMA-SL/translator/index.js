@@ -5,6 +5,9 @@ const FieldAssign = require("../syntax/FieldAssign");
 const NOpt = require("../syntax/NOpt");
 const Val = require("../syntax/Val");
 const Var = require("../syntax/Var");
+const Return = require("../syntax/Return");
+const Function = require("../syntax/Func");
+const Block = require("../syntax/Block");
 
 function translateLiteral(eslVal) {
   return {
@@ -111,6 +114,17 @@ function traverseAndTranslate(value) {
   }
 }
 
+function fromJSObjectToESLStatements(objProg = {}) {
+  const { expression, statements } = traverseAndTranslate(objProg);
+
+  return statements.concat(new Return(expression));
+}
+
+function createFunction(name = "", params = [], statements = []) {
+  return new Function(name, params, new Block(statements));
+}
+
 module.exports = {
-  traverseAndTranslate,
+  fromJSObjectToESLStatements,
+  createFunction,
 };
