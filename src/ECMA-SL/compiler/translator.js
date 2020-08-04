@@ -39,7 +39,8 @@ function translateNumber(value) {
   return translateLiteral(new Val.Flt(value));
 }
 
-function translateArray(varExpr, arr = []) {
+function translateArray(arr = []) {
+  const varExpr = new Var(generateFreshVar());
   const exprsAndStmts = arr.map(traverseAndTranslate).reduce(
     (acc, exprStmts) => ({
       exprs: acc.exprs.concat(exprStmts.expression),
@@ -56,7 +57,8 @@ function translateArray(varExpr, arr = []) {
   };
 }
 
-function translateObject(varExpr, obj) {
+function translateObject(obj) {
+  const varExpr = new Var(generateFreshVar());
   const newObjStmt = new Assign(varExpr, new NewObj());
 
   const objStmts = Object.keys(obj)
@@ -66,11 +68,7 @@ function translateObject(varExpr, obj) {
         acc
           .concat(propValue.value.statements)
           .concat(
-            new FieldAssign(
-              new Var(varExpr),
-              propValue.prop,
-              propValue.value.expression
-            )
+            new FieldAssign(varExpr, propValue.prop, propValue.value.expression)
           ),
       [newObjStmt]
     );
@@ -101,11 +99,11 @@ function traverseAndTranslate(value) {
       if (value === null) {
         return translateNull();
       } else if (value instanceof Array) {
-        return translateArray(generateFreshVar(), value);
+        return translateArray(value);
       } else if (value instanceof RegExp) {
         throw new Error("Regular expressions are not supported: " + value);
       } else {
-        return translateObject(generateFreshVar(), value);
+        return translateObject(value);
       }
 
     default:

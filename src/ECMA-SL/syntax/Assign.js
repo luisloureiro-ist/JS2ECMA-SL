@@ -1,14 +1,14 @@
 const Stmt = require("./Stmt");
 
 class Assign extends Stmt {
-  constructor(varname, expression) {
+  constructor(variable, expression) {
     super();
-    this.varname = varname;
+    this.variable = variable;
     this.expression = expression;
   }
 
   toString() {
-    return `${this.varname} := ${this.expression.toString()}`;
+    return `${this.variable.toString()} := ${this.expression.toString()}`;
   }
 }
 
