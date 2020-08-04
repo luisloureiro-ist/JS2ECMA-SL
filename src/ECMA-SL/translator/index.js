@@ -120,11 +120,15 @@ function fromJSObjectToESLStatements(objProg = {}) {
   return statements.concat(new Return(expression));
 }
 
-function createFunction(name = "", params = [], statements = []) {
+function fromESLStatementsToESLFunction(
+  name = "",
+  params = [],
+  statements = []
+) {
   return new Function(name, params, new Block(statements));
 }
 
 module.exports = {
   fromJSObjectToESLStatements,
-  createFunction,
+  fromESLStatementsToESLFunction,
 };

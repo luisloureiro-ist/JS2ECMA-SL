@@ -18,7 +18,11 @@ fs.readFile(argv.input, "utf-8", (err, data) => {
   const prog = esprima.parseScript(data);
 
   const statements = translator.fromJSObjectToESLStatements(prog);
-  const func = translator.createFunction("buildAST", [], statements);
+  const func = translator.fromESLStatementsToESLFunction(
+    "buildAST",
+    [],
+    statements
+  );
 
   console.log(func.toString());
 });
