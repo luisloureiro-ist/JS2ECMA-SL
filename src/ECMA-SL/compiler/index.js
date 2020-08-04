@@ -4,9 +4,9 @@ const Function = require("../syntax/Func");
 const Block = require("../syntax/Block");
 
 function fromJSObjectToESLStatements(objProg = {}) {
-  const { variable, statements } = traverseAndTranslate(objProg);
+  const { expression, statements } = traverseAndTranslate(objProg);
 
-  return statements.concat(new Return(variable));
+  return statements.concat(new Return(expression));
 }
 
 function createFunction(name = "", params = [], statements = []) {

@@ -8,7 +8,7 @@ const Var = require("../syntax/Var");
 
 function translateLiteral(eslVal) {
   return {
-    variable: new Val(eslVal),
+    expression: new Val(eslVal),
     statements: [],
   };
 }
@@ -40,18 +40,18 @@ function translateNumber(value) {
 }
 
 function translateArray(varExpr, arr = []) {
-  const varsAndStmts = arr.map(traverseAndTranslate).reduce(
-    (acc, varStmt) => ({
-      vars: acc.vars.concat(varStmt.variable),
-      stmts: acc.stmts.concat(varStmt.statements),
+  const exprsAndStmts = arr.map(traverseAndTranslate).reduce(
+    (acc, exprStmts) => ({
+      exprs: acc.exprs.concat(exprStmts.expression),
+      stmts: acc.stmts.concat(exprStmts.statements),
     }),
-    { vars: [], stmts: [] }
+    { exprs: [], stmts: [] }
   );
 
   return {
-    variable: varExpr,
-    statements: varsAndStmts.stmts.concat(
-      new Assign(varExpr, new NOpt(new NOpt.ListExpr(), varsAndStmts.vars))
+    expression: varExpr,
+    statements: exprsAndStmts.stmts.concat(
+      new Assign(varExpr, new NOpt(new NOpt.ListExpr(), exprsAndStmts.exprs))
     ),
   };
 }
@@ -69,14 +69,14 @@ function translateObject(varExpr, obj) {
             new FieldAssign(
               new Var(varExpr),
               propValue.prop,
-              propValue.value.variable
+              propValue.value.expression
             )
           ),
       [newObjStmt]
     );
 
   return {
-    variable: varExpr,
+    expression: varExpr,
     statements: objStmts,
   };
 }
