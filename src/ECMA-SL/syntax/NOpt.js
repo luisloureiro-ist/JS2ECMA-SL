@@ -16,7 +16,15 @@ class NOpt extends Expr {
 
 NOpt.ListExpr = class {
   toString(elements = []) {
-    return `[ ${elements.join(", ")} ]`;
+    // Array.prototype.join concatenates the empty string when null or undefined appear.
+    return `[ ${elements
+      .map((elem) => {
+        if (elem === null || elem === undefined) {
+          return String(elem);
+        }
+        return elem;
+      })
+      .join(", ")} ]`;
   }
 };
 
