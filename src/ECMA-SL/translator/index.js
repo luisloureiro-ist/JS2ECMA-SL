@@ -1,4 +1,5 @@
 const { generateFreshVar } = require("./generator");
+const Transforms = require("../transforms");
 const Assign = require("../syntax/Assign");
 const NewObj = require("../syntax/NewObj");
 const FieldAssign = require("../syntax/FieldAssign");
@@ -106,49 +107,13 @@ function traverseAndTranslate(value) {
       } else if (value instanceof RegExp) {
         throw new Error("Regular expressions are not supported: " + value);
       } else {
-        const obj = transformObject(value);
+        const obj = Transforms.transformObject(value);
         return translateObject(obj);
       }
 
     default:
       throw new Error("Unexpected value: " + value);
   }
-}
-
-function transformObject(obj) {
-  /**
-   * Transform a Esprima SwitchStatement in a slightly different object that better fits the needs of
-   * interpreting the specification of the switch statement as defined in the ES5 standard.
-   */
-  if (obj.type === "SwitchStatement") {
-    const newObj = {
-      type: obj.type,
-      discriminant: obj.discriminant,
-      cases: [],
-    };
-
-    const casesA = [];
-    const casesB = [];
-    let defaultCase = null;
-
-    obj.cases.forEach((caze) => {
-      if (defaultCase === null && caze.test) {
-        casesA.push(caze);
-      } else if (caze.test === null) {
-        defaultCase = caze;
-      } else {
-        casesB.push(caze);
-      }
-    });
-
-    newObj.cases.push(casesA);
-    newObj.cases.push(defaultCase);
-    newObj.cases.push(casesB);
-
-    return newObj;
-  }
-
-  return obj;
 }
 
 function fromJSObjectToESLStatements(objProg = {}) {
