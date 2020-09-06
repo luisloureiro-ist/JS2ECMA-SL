@@ -17,6 +17,9 @@ Val.Str = class {
   }
 
   toString() {
+    if (this.value.startsWith('"')) {
+      return `"${this.value.split('"').join('\\"')}"`;
+    }
     return `"${this.value}"`;
   }
 };
